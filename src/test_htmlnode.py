@@ -1,7 +1,7 @@
 
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class test_HTMLNode(unittest.TestCase):
@@ -53,6 +53,7 @@ class test_HTMLNode(unittest.TestCase):
             repr(node)
         )
 
+
 class TestLeafNode(unittest.TestCase):
     def test_leaf_to_html_p(self):
         node = LeafNode('p', "Hello, world!")
@@ -88,6 +89,67 @@ class TestLeafNode(unittest.TestCase):
             "LeafNode(p, Hello, world!, None)",
             repr(node)
         )
+
+
+class TestParentNode(unittest.TestCase):
+    def test_to_html_with_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            "<div><span>child</span></div>",
+            parent_node.to_html()
+        )
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode('b', "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            "<div><span><b>grandchild</b></span></div>",
+            parent_node.to_html()
+        )
+
+    def test_to_html_with_nested_parents(self):
+        item1 = LeafNode("li", "dog food")
+        item2 = LeafNode("li", "cat food")
+        grandchild_node = ParentNode("ol", [item1, item2], {"class": "important"})
+        child_node = ParentNode("h1", [grandchild_node])
+        parent_node = ParentNode("div", [child_node], {"class": "primary"})
+        self.assertEqual(
+            "<div class=\"primary\"><h1><ol class=\"important\"><li>dog food</li><li>cat food</li></ol></h1></div>",
+            parent_node.to_html()
+        )
+
+    def test_to_html_no_children(self):
+        parent_node = ParentNode("div", None)
+        self.assertRaises(
+            ValueError,
+            parent_node.to_html
+        )
+
+    def test_to_html_with_many_children(self):
+        children = [LeafNode("li", "Bank of China", {"class": "Asia"}), LeafNode("li", "Bank of America")]
+        parent_node = ParentNode('ul', children, {"class": "important"})
+        self.assertEqual(
+            "<ul class=\"important\"><li class=\"Asia\">Bank of China</li><li>Bank of America</li></ul>",
+            parent_node.to_html()
+        )
+
+    def test_to_html_heading(self):
+        parent_node = ParentNode(
+            "h1",
+            [
+                LeafNode('b', "Most bold"),
+                LeafNode(None, "and"),
+                LeafNode('i', "Most italic"),
+                LeafNode(None, "man")
+            ],
+        )
+        self.assertEqual(
+            "<h1><b>Most bold</b>and<i>Most italic</i>man</h1>",
+            parent_node.to_html()
+        )
+
 
 
 if __name__ == "__main__":
