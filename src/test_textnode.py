@@ -1,7 +1,7 @@
 
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -31,6 +31,40 @@ class TestTextNode(unittest.TestCase):
             "TextNode(This is a text node, link, https://boot.dev)",
             repr(node)
         )
+
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
+    def test_text(self):
+        text_node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(text_node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+        self.assertEqual(html_node.props, None)
+
+    def test_bold(self):
+        text_node = TextNode("I am the boldest", TextType.BOLD)
+        html_node = text_node_to_html_node(text_node)
+        self.assertEqual(html_node.tag, 'b')
+        self.assertEqual(html_node.value, "I am the boldest")
+
+    def test_link(self):
+        text_node = TextNode("click me", TextType.LINK, "https://boot.dev")
+        html_node = text_node_to_html_node(text_node)
+        self.assertEqual(html_node.tag, 'a')
+        self.assertEqual(html_node.value, "click me")
+        self.assertEqual(html_node.props, {"href": f"{text_node.url}"})
+
+    def test_image(self):
+        text_node = TextNode("alternate text", TextType.IMAGE, "https://boot.dev")
+        html_node = text_node_to_html_node(text_node)
+        self.assertEqual(html_node.tag, "img")
+        self.assertEqual(html_node.value, None)
+        self.assertEqual(html_node.props, {"src": f"{text_node.url}", "alt": f"{text_node.text}"})
+
+    def test_no_type(self):
+        text_node = TextNode(None, None)
+        self.assertRaises(ValueError, text_node_to_html_node, text_node)
+
 
 if __name__ == "__main__":
     unittest.main()
