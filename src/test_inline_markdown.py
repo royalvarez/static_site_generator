@@ -1,7 +1,7 @@
 
 import unittest
 
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 
 from textnode import TextNode, TextType
 
@@ -185,6 +185,199 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             ],
             matches
         )
+
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_split_single_image_start(self):
+        nodes = TextNode(
+            "![image](https://i.imgur.com/zjjcJKZ.png)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_image([nodes])
+        self.assertEqual(
+            [
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png",),
+            ],
+            new_nodes
+        )
+
+
+    def test_split_single_image_middle(self):
+            nodes = TextNode(
+            "This is a single ![image](https://i.imgur.com/zjjcJKZ.png) in between text",
+            TextType.TEXT
+        )
+            new_nodes = split_nodes_image([nodes])
+            self.assertEqual(
+                [
+                    TextNode("This is a single ", TextType.TEXT),
+                    TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png",),
+                    TextNode(" in between text", TextType.TEXT)
+                ],
+                new_nodes
+            )
+
+
+    def test_split_single_image_end(self):
+            nodes = TextNode(
+            "This is a single at the end ![image](https://i.imgur.com/zjjcJKZ.png)",
+            TextType.TEXT
+        )
+            new_nodes = split_nodes_image([nodes])
+            self.assertEqual(
+                [
+                    TextNode("This is a single at the end ", TextType.TEXT),
+                    TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png",)
+                ],
+                new_nodes
+            )
+
+
+    def test_split_double_image_start_end(self):
+        nodes = TextNode(
+            "![image](https://i.imgur.com/zjjcJKZ.png) ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_image([nodes])
+        self.assertEqual(
+            [
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(' ', TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png")
+            ],
+            new_nodes
+        )
+
+
+    def test_split_image_start_middle(self):
+        nodes = TextNode(
+            "![image](https://i.imgur.com/zjjcJKZ.png) and ![second image](https://i.imgur.com/3elNhQu.png) is in between text",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_image([nodes])
+        self.assertEqual(
+            [
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+                TextNode(" is in between text", TextType.TEXT)
+            ],
+            new_nodes
+        )
+
+
+    def test_split_image_middle_end(self):
+        nodes = TextNode(
+            "This is in between text ![image](https://i.imgur.com/zjjcJKZ.png) and this is at the end ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_image([nodes])
+        self.assertEqual(
+            [
+                TextNode("This is in between text ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and this is at the end ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png")
+            ],
+            new_nodes
+        )
+
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_split_single_link_start(self):
+        nodes = TextNode(
+            "[link](https://boot.dev)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([nodes])
+        self.assertEqual(
+            [
+                TextNode("link", TextType.LINK, "https://boot.dev")
+            ],
+            new_nodes
+        )
+
+
+    def test_split_single_link_middle(self):
+        nodes = TextNode(
+            "This is [link](https://boot.dev) in between text",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([nodes])
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(" in between text", TextType.TEXT)
+            ],
+            new_nodes
+        )
+
+
+    def test_split_single_link_end(self):
+            nodes = TextNode(
+            "This is a single at the end [link](https://boot.dev)",
+            TextType.TEXT
+        )
+            new_nodes = split_nodes_link([nodes])
+            self.assertEqual(
+                [
+                    TextNode("This is a single at the end ", TextType.TEXT),
+                    TextNode("link", TextType.LINK, "https://boot.dev")
+                ],
+                new_nodes
+            )
+
+
+    def test_split_double_image_start_end(self):
+        nodes = TextNode(
+            "[link](https://boot.dev) [second link](https://youtube.com)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([nodes])
+        self.assertEqual(
+            [
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(' ', TextType.TEXT),
+                TextNode("second link", TextType.LINK, "https://youtube.com")
+            ],
+            new_nodes
+        )
+
+
+    def test_split_image_start_middle(self):
+        nodes = TextNode(
+            "[link](https://boot.dev) and [second link](https://youtube.com) is in between text",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([nodes])
+        self.assertEqual(
+            [
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("second link", TextType.LINK, "https://youtube.com"),
+                TextNode(" is in between text", TextType.TEXT)
+            ],
+            new_nodes
+        )
+
+
+    def test_split_image_middle_end(self):
+        nodes = TextNode(
+            "This is in between text [link](https://boot.dev) and this is at the end [second link](https://youtube.com)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([nodes])
+        self.assertEqual(
+            [
+                TextNode("This is in between text ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(" and this is at the end ", TextType.TEXT),
+                TextNode("second link", TextType.LINK, "https://youtube.com")
+            ],
+            new_nodes
+        )
+
 
 
 if __name__ == "__main__":
