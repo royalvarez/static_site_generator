@@ -58,7 +58,7 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         text_node = TextNode("alternate text", TextType.IMAGE, "https://boot.dev")
         html_node = text_node_to_html_node(text_node)
         self.assertEqual(html_node.tag, "img")
-        self.assertEqual(html_node.value, None)
+        self.assertEqual(html_node.value, "")
         self.assertEqual(html_node.props, {"src": f"{text_node.url}", "alt": f"{text_node.text}"})
 
     def test_no_type(self):
