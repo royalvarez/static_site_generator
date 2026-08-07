@@ -161,7 +161,7 @@ tag here
 This is another paragraph with _italic_ text and `code` here
 
 """
-        tree = markdown_to_html_node(md)
+        tree = markdown_to_html_node(md).to_html()
         self.assertEqual(
             "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
             tree
@@ -175,7 +175,7 @@ This is another paragraph with _italic_ text and `code` here
 
 ###### Remember `lang=python`
 """
-        tree = markdown_to_html_node(md)
+        tree = markdown_to_html_node(md).to_html()
         self.assertEqual(
             "<div><h1>This is a <b>bold</b> story in <i>italic</i></h1><h2>This is <a href=\"https://boot.dev\">Bootdev</a></h2><h6>Remember <code>lang=python</code></h6></div>",
             tree
@@ -188,7 +188,7 @@ This is text that _should_ remain
 the **same** even with inline stuff
 ```
 """
-        tree = markdown_to_html_node(markdown)
+        tree = markdown_to_html_node(markdown).to_html()
         self.assertEqual(
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
             tree
@@ -202,7 +202,7 @@ the **same** even with inline stuff
 1. Beyond
 2. Delispice
 """
-        tree = markdown_to_html_node(md)
+        tree = markdown_to_html_node(md).to_html()
         self.assertEqual(
             "<div><ul><li>Compsci</li><li>Phil</li></ul><ol><li>Beyond</li><li>Delispice</li></ol></div>",
             tree
@@ -214,7 +214,7 @@ the **same** even with inline stuff
 > of the new order
 > ![image](https://image.png)
 """
-        tree = markdown_to_html_node(md)
+        tree = markdown_to_html_node(md).to_html()
         self.assertEqual(
             "<div><blockquote>Cogito ergo sum of the new order <img src=\"https://image.png\" alt=\"image\"></img></blockquote></div>",
             tree

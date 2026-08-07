@@ -21,7 +21,7 @@ def markdown_to_html_node(markdown: str) -> ParentNode:
     blocks = markdown_to_blocks(markdown)
     children = blocks_to_html_nodes(blocks)
 
-    return ParentNode("div", children, None).to_html()
+    return ParentNode("div", children, None)
 
 
 def                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     blocks_to_html_nodes(blocks: list[str]) -> list[ParentNode]:
