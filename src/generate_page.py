@@ -3,8 +3,6 @@ from pathlib import Path
 
 from block_markdown import markdown_to_html_node
 
-from extract_title import extract_title
-
 
 def generate_page(from_path: Path, template_path: Path, destination_path: Path):
     print(f"Generating page from {from_path} to {destination_path} using {template_path}")
@@ -28,3 +26,14 @@ def generate_page(from_path: Path, template_path: Path, destination_path: Path):
     if not destination_path.exists():
         Path.touch(destination_path, exist_ok=True)
     destination_path.write_text(template_content)
+
+
+def extract_title(markdown: str) -> str:
+    lines = markdown.split("\n")
+
+    title = ""
+    for line in lines:
+        if line.startswith("# "):
+            title += line.lstrip("#").strip()
+            return title
+    raise ValueError("Invalid markdown, missing title")
