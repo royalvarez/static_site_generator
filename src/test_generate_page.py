@@ -1,7 +1,7 @@
 
 import unittest
 
-from extract_title import extract_title
+from generate_page import extract_title
 
 
 class TestExtractTitleMarkdown(unittest.TestCase):
