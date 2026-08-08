@@ -6,7 +6,7 @@ import shutil
 
 def copy_static(from_path: Path, destination_path: Path):
     if not destination_path.exists():
-        Path.mkdir(destination_path)
+        Path.mkdir(destination_path, parents=True)
     copy_static_r(from_path, destination_path)
 
 
