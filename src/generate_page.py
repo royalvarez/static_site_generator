@@ -4,7 +4,7 @@ from pathlib import Path
 from block_markdown import markdown_to_html_node
 
 
-def generate_page(from_path: Path, template_path: Path, destination_path: Path):
+def generate_page(from_path: Path, template_path: Path, destination_path: Path, base_path: str):
     print(f"Generating page from {from_path} to {destination_path} using {template_path}")
 
     if not from_path.exists():
@@ -22,13 +22,15 @@ def generate_page(from_path: Path, template_path: Path, destination_path: Path):
 
     template_content = template_content.replace("{{ Title }}", html_title)
     template_content  = template_content.replace("{{ Content }}", html)
+    template_content  = template_content.replace("href=\"/", f"href=\"{base_path}")
+    template_content  = template_content.replace("src=\"/", f"src=\"{base_path}")
 
     if not destination_path.exists():
         Path.touch(destination_path, exist_ok=True)
     destination_path.write_text(template_content)
 
 
-def generate_pages_r(from_path: Path, template_path: Path, destination_path: Path):
+def generate_pages_r(from_path: Path, template_path: Path, destination_path: Path, base_path: str):
     if not template_path.exists():
         raise ValueError(f"Invalid path: {template_path} could not be found")
 
@@ -36,7 +38,7 @@ def generate_pages_r(from_path: Path, template_path: Path, destination_path: Pat
         if child_path.is_dir():
             new_from_path = child_path
             new_destination_path = destination_path.joinpath(child_path.name)
-            generate_pages_r(new_from_path, template_path, new_destination_path)
+            generate_pages_r(new_from_path, template_path, new_destination_path, base_path)
 
         else:
             for file_path in from_path.iterdir():
@@ -65,6 +67,8 @@ def generate_pages_r(from_path: Path, template_path: Path, destination_path: Pat
             
                 template_content = template_content.replace("{{ Title }}", html_title)
                 template_content  = template_content.replace("{{ Content }}", html)
+                template_content  = template_content.replace("href=\"/", f"href=\"{base_path}")
+                template_content  = template_content.replace("src=\"/", f"src=\"{base_path}")
 
                 if not destination_path.exists():
                     destination_path.mkdir(parents=True)
